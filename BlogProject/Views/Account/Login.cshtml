@@ -1,0 +1,49 @@
+﻿@model LoginVM
+@{
+    ViewData["Title"] = "Login";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
+</head>
+
+<div class="post">
+<div class="post-content">
+    <h2>Login</h2>
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="mb-1">
+            <label asp-for="Username"></label><br>
+            <input asp-for="Username"></input>
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="mb-1">
+            <label asp-for="Password"></label><br>
+                <input asp-for="Password"></input>
+                <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="mb-1">
+            <label class="form-check-label"><input asp-for="RememberMe"> Remember me</input>
+            </label>
+        </div>
+       
+        <div class="col-4">
+                <button type="submit" value="Login">Login</button>
+        </div>
+    </form>
+        <br>
+        <div class="row">
+            <div class="col-8">
+                <a class="clearLink" asp-action="Register">Don't have an account?</a>
+            </div>
+        </div>
+</div>
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

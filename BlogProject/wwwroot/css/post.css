@@ -1,0 +1,119 @@
+﻿.post
+{ 
+    border-radius: 5px;
+    
+    background-color: rgb(44, 44, 44);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 700px;
+}
+
+.post-username {
+    padding: 8px;
+    padding-left: 12px;
+    width: auto;
+    text-align: left;
+    font-size: 20px;
+    color: white;
+    float: left;
+    
+}
+.post-date
+{
+    padding: 10px;
+    padding-left: 0px;
+    float: left;
+    font-size: 16px;
+    color: aqua;
+}
+.post-content
+{
+    text-align: left;
+    padding: 10px;
+    padding-top: 1px;
+    color: white;
+    clear: both;
+    min-height: 50px;
+}
+.post-commentCounter
+{
+    padding-left: 4px;
+    text-align: left;    
+    color: gray;
+}
+.comment-username {
+    font-size: 16px;
+    width: auto;
+    text-align: left;
+    float: left;
+}
+.comment-date {
+    padding: 4px;
+    padding-left: 5px;
+    float: left;
+    font-size: 12px;
+    color: aqua;
+}
+
+.comment-section
+{
+    width: auto;    
+    height: auto;
+}
+.comment-aura
+{
+    margin: 5px;
+}
+.comment
+{
+    clear:both;
+    color: white;
+    background-color: rgb(70, 70, 70);
+    
+    padding: 5px;
+}
+.comment-content {
+    min-height: 30px;
+    clear: both;
+}
+
+.clearLink
+{
+    text-decoration: none;
+    color: inherit; /* Use the default text color */
+}
+.clearLink:hover
+{
+    text-decoration: none;
+    color: rgb(0, 238, 255); /* Use the default text color */
+}
+
+.deleteCommentContainer {
+    text-align: right;
+    
+}
+
+.text-error {
+    color: orange;
+}
+
+.button-deletePost 
+{
+  all: unset; /* Resets all properties to their inherited values or initial values */
+  /* display: inline-block; */
+  float: right;
+  padding: 3px;
+  padding-left: 20px;
+  padding-right: 20px;
+  /*border: 1px solid black;*/ /* Add a border to make it a square */
+  background-color: rgb(179, 0, 0); /* Set background color */
+  color: rgb(255, 255, 255); /* Set text color */
+  text-align: center; /* Center align the text */
+  cursor: pointer; /* Add a pointer cursor on hover */
+  font-family: inherit; /* Inherit font from parent */
+  font-size: 14px; /* Inherit font size from parent */
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  font-family: 'roboto_bold'; /* Name to reference the font */
+  /*line-height: normal;*/ /* Set line height to normal */
+}

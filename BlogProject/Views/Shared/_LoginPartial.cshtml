@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<BlogUser> _signInManager
+@{
+}
+
+<ul class="navbar-nav">
+    
+    @if (_signInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <div class="headerUsername">
+                @User.Identity!.Name
+            </div>
+        </li>
+        <li>
+            <a class="clearLink" href="/Account/Logout"><div class="logoutButton"> Logout </div></a>
+        </li>
+        @* <a asp-action="Logout" asp-controller="Account">Logout</a> *@
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="register">Register</a>
+        </li>
+    }
+    
+</ul>

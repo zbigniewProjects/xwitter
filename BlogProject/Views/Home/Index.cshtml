@@ -1,0 +1,67 @@
+﻿@using BlogProject.Contracts.Post
+@using Microsoft.AspNetCore.Identity
+@model IndexVM
+@{
+    ViewData["Title"] = "Xwitter";
+}
+
+<head>
+    <script src="~/js/postAndValidate.js"></script>
+    <script src="~/js/loadContent.js"></script>
+    <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
+</head>
+
+<div id="feedContainer">
+
+    @if(Model.Username != null) 
+    {
+        <div class="post">
+            <div class="post-content">
+                <h3>Hello @Model.Username</h3>
+                <form id="submitPostForm">
+                    <textarea placeholder="What is happening?..." name="Content"></textarea>
+                    <br>
+                    <div id="errorOutput" class="text-error"></div>
+                </form>
+                <button id="submitPost">Post</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <text>
+            <div class="post">
+                <div class="post-content">
+
+                <h3>Login to add post</h3>
+                    <a href="/Account/Login"><button>Login</button></a>
+                </div>
+            </div>
+        </text>   
+    }
+    @await Html.PartialAsync("_FeedPartial", Model.Posts)
+
+</div>
+<button id="fetchDataBtn">Load more posts</button>
+
+<script>
+    var state = {};
+
+    document.getElementById("fetchDataBtn").addEventListener("click", function () {
+        LoadMoreContent('/Home/LoadMorePosts/', state, document.getElementById("feedContainer"));
+    });
+
+    $(document).ready(function () {
+        $('#submitPost').click(function () {
+            let myform = document.getElementById("submitPostForm");
+            let fd = new FormData(myform);
+
+            jsonObject = {
+                Content: fd.get("Content")
+            };
+
+            let errorOutput = document.getElementById("errorOutput");
+            PostAndValidateAndRedirect("/Post/Post", jsonObject, errorOutput);
+        });
+    });
+</script>

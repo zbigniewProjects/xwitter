@@ -1,0 +1,37 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model CommentSupplyVM
+<head>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+</head>
+
+@if (Model != null && Model.CommentsVMs != null && Model.CommentsVMs.Length > 0)
+{
+    for (uint i = 0; i < Model.CommentsVMs!.Length; i++)
+    {
+        PostCommentVM com = Model.CommentsVMs[i];
+        <div id=@($"com{@com.CommentID}") class="comment-aura">
+            <div class="comment">
+
+                <div class="comment-username">
+                    <a class="link-account" href="/@com.AuthorName">@com.AuthorName</a>
+                </div>
+                <div class="comment-date">
+                    @ViewUtils.CalculateHowMuchTimePassed((DateTime)com.PostedAt!) <br>
+                </div> <br>
+                <div class="comment-content">
+                    @com.Content
+                </div>
+            </div>
+            @if (Model.IsAuthenticated && com.AuthorID == Model.UserID)
+            {
+                <div class="deleteCommentContainer">
+                    <button class="deleteComButton" id=@($"deleteComment{@com.CommentID}") data-id="@com.CommentID">Delete comment</button>
+                </div>
+            }
+        </div>   
+    }
+}

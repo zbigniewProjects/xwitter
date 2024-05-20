@@ -1,0 +1,14 @@
+﻿@using BlogProject.Contracts.Post
+@model PublishCommentRequest
+
+@{
+    ViewData["Title"] = "Create Post";
+}
+
+<form id="commentForm">
+    <div class="form-group">
+        <input name="postID" type="hidden" value="@Model.postID" />
+        <textarea class="comment-textarea" id="commentContent" name="Content"></textarea>
+    </div>
+</form>
+<button id="addCom" type="submit">Add comment</button>

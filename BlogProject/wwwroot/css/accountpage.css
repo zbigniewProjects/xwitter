@@ -1,0 +1,19 @@
+﻿
+.panelContainer 
+{
+    align-content:flex-end;
+}
+.panel {
+    float: left;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgb(44, 44, 44);
+    min-height: 200px;
+    width: 700px;
+}
+.profilePicture {
+    float: left;
+    background-color: yellow;
+    width: 200px;
+    height: 200px;
+}

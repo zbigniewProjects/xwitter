@@ -1,0 +1,27 @@
+﻿@model PostEntry[]
+@for (int i = 0; i < Model.Length; i++)
+{
+    PostEntry post = Model[i];
+        <div class="post">
+            <div class="post-username">
+                <a class="link-account" href="/@post.AuthorName">@post.AuthorName</a>
+            </div>
+            <div class="post-date">
+                @ViewUtils.CalculateHowMuchTimePassed(post.Date) <br>
+            </div>
+
+            <a class="clearLink" href="/post/@post.Id">
+                <div class="post-content">
+                @post.Content
+                </div>
+            
+            <div class="post-commentCounter">
+                Comments: @post.NumberOfComments
+            </div>
+            </a>
+            <div class="comment-section">
+                
+            </div>
+        </div>
+
+}

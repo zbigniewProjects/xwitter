@@ -1,0 +1,56 @@
+﻿@using BlogProject.MVC.Models
+@*
+*@
+@{
+}
+@model AccountPageVM
+
+<head>
+    <script src="~/js/loadContent.js"></script>
+
+    <link rel="stylesheet" href="~/css/accountpage.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
+</head>
+
+<div class="panelContainer">
+    <div class="profilePicture"></div>
+    <div class="panel">
+    <h1>@Model.Username</h1>
+    @Model.ShortInfo
+
+    @if (Model.IsAuthenticated)
+    {
+        <br>
+        <button>Save info</button>
+    }
+    </div>
+</div>
+@{
+    ViewData["Title"] = $"{Model.Username} - Xwitter";
+}
+
+@if (Model.TotalNumberOfPosts > 0)
+{
+    <h2>Recent posts:</h2>
+}
+else
+{
+    <text><h2>This user has not posted anything yet</h2></text>
+}
+
+<div id="feedContainer">
+</div>
+<button id="fetchDataBtn">Load more posts</button>
+<input id="userID" type="hidden" value="@Model.UserId">Load more posts</input>
+
+<script>
+    var state = {};
+    var button = document.getElementById('fetchDataBtn');
+    var id = document.getElementById('userID').value;
+    if (button != null) {
+        LoadMoreContent('/Post/GetUserPosts/' + id + ':', state, document.getElementById("feedContainer"));
+        $(document).on('click', '#fetchDataBtn', function () {
+            LoadMoreContent('/Post/GetUserPosts/' + id + ':', state, document.getElementById("feedContainer"));
+        });
+    }
+</script>

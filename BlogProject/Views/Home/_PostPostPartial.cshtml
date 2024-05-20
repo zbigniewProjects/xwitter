@@ -1,0 +1,21 @@
+﻿@* @model PublishPostRequest *@
+@using BlogProject.Contracts.Post
+
+@{
+    ViewData["Title"] = "Create Post";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
+</head>
+
+<div class="post">
+    <div class="post-content">
+        <h1>Create Post</h1>
+        <form id="submitPostForm">
+            <textarea placeholder="What is happening?..." name="Content" /></textarea>
+            <br><div id="errorOutput" class="text-error"></div>
+        </form>
+        <button id="submitPost">Post</button>
+    </div>
+</div>

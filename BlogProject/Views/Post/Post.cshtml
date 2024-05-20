@@ -1,0 +1,156 @@
+﻿@using BlogProject.Contracts.Post
+@using Microsoft.AspNetCore.Http
+@model PostVM
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = Model.Content;
+}
+
+<head>
+    <script src="~/js/postAndValidate.js"></script>
+    <script src="~/js/delete.js"></script>
+    <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
+</head>
+
+<div class="post">
+    <div class="post-username">
+        <a class="link-account" href="/@Model.AuthorName">@Model.AuthorName</a>
+    </div>
+    <div class="post-date">
+        @ViewUtils.CalculateHowMuchTimePassed(Model.Date) <br>
+    </div>
+
+    @if (Model.IsAuthenticated)
+    {
+        <div>
+            <button id="deletePostButton" class="button-deletePost">Delete this post</button>
+        </div>
+    }
+    
+    <div class="post-content">
+        @Model.Content
+    </div>
+
+    <div class="post-commentCounter">
+        Comments: @Model.NumberOfComments
+    </div>
+
+    <div class="post-your-comment">
+        @if (User.Identity!.IsAuthenticated)
+        {
+            <div class="comment-aura">
+                <div class="comment">
+                    @await Html.PartialAsync("_PostYourCommentPartial", new PublishCommentRequest(Model.Id, string.Empty))
+                    <br><div id="errorOutput" class="text-error"></div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    <div id="comment-section" class="comment-section">
+        @await Html.PartialAsync("_CommentsPartial", Model.Comments)
+    </div>
+    @if (Model.NumberOfComments > 0)
+    {
+        <div style="clear:both">
+            <button id="fetchDataBtn">Load more comments</button>
+        </div>
+    }
+</div>
+
+
+<script>
+
+    var loadedCycles = 1;
+    var loadMoreCommentsBtn = document.getElementById("fetchDataBtn");
+    if (loadMoreCommentsBtn != null)
+    loadMoreCommentsBtn.addEventListener("click", function () {
+        
+        //loadPartialView('/Post/getMoreComments/' + @Model.Id +":" + loadedCycles, document.getElementById("comment-section"));
+        fetch('/Post/getMoreComments/' + @Model.Id +":"+ loadedCycles)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text(); // Assume response is HTML
+            })
+            .then(html => {
+                loadedCycles += 1;
+                // Create a temporary container element
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = html;
+
+                // Append the content of the temporary container to the end of the page
+                document.getElementById("comment-section").appendChild(tempContainer);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    });
+    
+    var deleteComUrl = '/Post/deletecom/@(Model.Id):';
+    
+    //comments deletion handler
+    $(document).on('click', '.deleteComButton', function () {
+        // Extract the unique identifier from the button
+        var id = $(this).data('id');
+
+        // Construct the URL for the AJAX request
+        var url = deleteComUrl + id;
+
+        // Make the AJAX request
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (response) {
+                // Handle the response as needed
+                console.log('Response for element ' + id + ':', response);
+
+                history.replaceState(null, null, window.location.href);
+                handleDeletedComment('com'+id);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+
+                history.replaceState(null, null, window.location.href);
+            }
+        });
+
+        function handleDeletedComment(divName) {
+
+            var elementToRemove = document.getElementById(divName);
+            console.log(`Deleting com for ${divName}`);
+
+            if (elementToRemove) {
+                elementToRemove.remove();
+            } else {
+                console.log(`Did not find comment with ID ${divName} to delete on frontend`);
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        let errorOutput = document.getElementById("errorOutput");
+        $('#addCom').click(function () {
+            let myform = document.getElementById("commentForm");
+            let fd = new FormData(myform);
+
+            jsonObject = {
+                postID: parseInt(fd.get("postID"), 10),
+                Content: fd.get("Content")
+            };
+
+            PostAndValidateAndRedirect("/Post/PostComment", jsonObject, errorOutput);
+        });
+
+        var deleteButton = $('#deletePostButton');
+        if (deleteButton.length) {
+            console.log("listening on delete post button");
+            deleteButton.on('click', function () { MakeDeleteRequest('/post/deletepost/@(Model.Id)', null) });
+        } 
+    });
+
+</script>
