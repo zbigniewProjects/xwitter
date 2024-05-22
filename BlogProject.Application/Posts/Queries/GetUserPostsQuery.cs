@@ -1,4 +1,5 @@
-﻿using BlogProject.Application.Models.Post;
+﻿using BlogProject.Application.DTOs;
+using BlogProject.Application.Models.Post;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace BlogProject.Application.Posts.Queries
 {
-    public record GetUserPostsQuery(uint userID, int startIndex, int count) : IRequest<PostEntry[]>;
+    public record GetUserPostsQuery(uint userID, int startIndex, int count) : IRequest<GetUsersPostDTO>;
 }

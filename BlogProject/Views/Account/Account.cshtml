@@ -7,6 +7,7 @@
 
 <head>
     <script src="~/js/loadContent.js"></script>
+    <script src="~/js/loadMoreEntries.js"></script>
 
     <link rel="stylesheet" href="~/css/accountpage.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
@@ -29,28 +30,57 @@
     ViewData["Title"] = $"{Model.Username} - Xwitter";
 }
 
-@if (Model.TotalNumberOfPosts > 0)
-{
-    <h2>Recent posts:</h2>
-}
-else
-{
-    <text><h2>This user has not posted anything yet</h2></text>
-}
-
 <div id="feedContainer">
+    <br>
+    <h2>Posted by @Model.Username:</h2>
 </div>
 <button id="fetchDataBtn">Load more posts</button>
-<input id="userID" type="hidden" value="@Model.UserId">Load more posts</input>
+<input id="userID" type="hidden" value="@Model.UserId"></input>
 
 <script>
-    var state = {};
-    var button = document.getElementById('fetchDataBtn');
     var id = document.getElementById('userID').value;
-    if (button != null) {
-        LoadMoreContent('/Post/GetUserPosts/' + id + ':', state, document.getElementById("feedContainer"));
-        $(document).on('click', '#fetchDataBtn', function () {
-            LoadMoreContent('/Post/GetUserPosts/' + id + ':', state, document.getElementById("feedContainer"));
-        });
+    var postsUrl = '/Post/GetUserPosts/' + id + ':';
+    var loadMorePostsButton = document.getElementById('fetchDataBtn');
+
+    var feedDiv = document.getElementById('feedContainer');
+
+    var pageState = { cycle: 0 };
+    LoadEntries(postsUrl, pageState, OnInitialPostsLoaded);
+    
+    loadMorePostsButton.addEventListener("click", function () {
+        LoadEntries(postsUrl, pageState, OnPostsLoaded);
+    });
+
+    function OnPostsLoaded(html, leftCount) {
+        feedDiv.innerHTML += html;
+
+        if (leftCount > 0) {
+            loadMorePostsButton.style.display = 'block';
+            loadMorePostsButton.innerHTML = leftCount > 5 ?
+                `There are ${leftCount} posts left, click to load 5 more` :
+                `There are ${leftCount} posts left, click to load them`;
+        } else {
+            loadMorePostsButton.style.display = 'none';
+        }
+    }
+
+    function OnInitialPostsLoaded(html, elementsCount, leftCount) {
+        if (elementsCount == 0) 
+        {
+            feedDiv.innerHTML = "<text><br><h2>This user has not posted anything yet</h2></text>";
+            loadMorePostsButton.style.display = 'none';
+            return;
+        }
+
+        feedDiv.innerHTML += html;
+
+        if (leftCount > 0) {
+            loadMorePostsButton.style.display = 'block';
+            loadMorePostsButton.innerHTML = leftCount > 5 ?
+                `There are ${leftCount} posts left, click to load 5 more` :
+                `There are ${leftCount} posts left, click to load them`;
+        } else {
+            loadMorePostsButton.style.display = 'none';
+        }
     }
 </script>

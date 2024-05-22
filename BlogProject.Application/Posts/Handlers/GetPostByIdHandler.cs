@@ -24,7 +24,7 @@ namespace BlogProject.Application.Posts.Handlers
             PostEntry post = new()
             {
                 Id = rawPost.Id,
-                AuthorName = rawAuthor.UserName,
+                AuthorName = rawAuthor != null? rawAuthor.UserName : "DeletedUser",
                 Content = rawPost.Content,
                 Date = (DateTime)rawPost.PostedAt!,
                 NumberOfComments = rawPost.Comments!.Count

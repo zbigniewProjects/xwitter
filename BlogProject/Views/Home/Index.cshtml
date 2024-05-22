@@ -8,60 +8,86 @@
 <head>
     <script src="~/js/postAndValidate.js"></script>
     <script src="~/js/loadContent.js"></script>
+    <script src="~/js/loadMoreEntries.js"></script>
     <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
 </head>
-
-<div id="feedContainer">
-
-    @if(Model.Username != null) 
-    {
-        <div class="post">
-            <div class="post-content">
-                <h3>Hello @Model.Username</h3>
-                <form id="submitPostForm">
-                    <textarea placeholder="What is happening?..." name="Content"></textarea>
-                    <br>
-                    <div id="errorOutput" class="text-error"></div>
-                </form>
-                <button id="submitPost">Post</button>
-            </div>
+@if(Model.Username != null) 
+{
+    <div class="post">
+        <div class="post-content">
+            <h3>Hello @Model.Username</h3>
+            <form id="submitPostForm">
+                <textarea placeholder="What is happening?..." name="Content"></textarea>
+                <br>
+                <div id="errorOutput" class="text-error"></div>
+            </form>
+            <button type="button" id="submitPostButton">Post</button>
         </div>
-    }
-    else
-    {
-        <text>
-            <div class="post">
-                <div class="post-content">
-
-                <h3>Login to add post</h3>
-                    <a href="/Account/Login"><button>Login</button></a>
-                </div>
-            </div>
-        </text>   
-    }
-    @await Html.PartialAsync("_FeedPartial", Model.Posts)
-
+    </div>
+}
+else
+{
+    <div class="post">
+        <div class="post-content">
+            <h3>Login to add post</h3>
+            <a href="/Account/Login">Login</a>
+        </div>
+    </div>
+}
+<div id="feedContainer">
 </div>
-<button id="fetchDataBtn">Load more posts</button>
+<button id="loadMorePostsButton">Load more posts</button>
 
 <script>
-    var state = {};
+    document.addEventListener('DOMContentLoaded', function () {
+        //load more posts section
+        var loadMorePostsButton = document.getElementById("loadMorePostsButton");
+        var feedDiv = document.getElementById("feedContainer");
+        var postsUrl = '/Home/LoadMorePosts/';
 
-    document.getElementById("fetchDataBtn").addEventListener("click", function () {
-        LoadMoreContent('/Home/LoadMorePosts/', state, document.getElementById("feedContainer"));
-    });
+        var pageState = {
+            cycle: 0
+        };
 
-    $(document).ready(function () {
-        $('#submitPost').click(function () {
-            let myform = document.getElementById("submitPostForm");
-            let fd = new FormData(myform);
+        function OnPostsReceived(html, elementCount, leftCount) {
+            feedDiv.innerHTML += html;
+            console.log("Posts loaded, there are: " + leftCount);
+            if (leftCount > 0) {
+                loadMorePostsButton.style.display = 'block';
+                loadMorePostsButton.innerHTML = leftCount > 5 ?
+                    `There are ${leftCount} posts left, click to load 5 more` :
+                    `There are ${leftCount} posts left, click to load them`;
+            } else {
+                loadMorePostsButton.style.display = 'none';
+            }
+        }
 
-            jsonObject = {
-                Content: fd.get("Content")
-            };
-
-            let errorOutput = document.getElementById("errorOutput");
-            PostAndValidateAndRedirect("/Post/Post", jsonObject, errorOutput);
+        //load more posts on end user input
+        loadMorePostsButton.addEventListener("click", function () {
+            LoadEntries(postsUrl, pageState, OnPostsReceived);
         });
+
+        //after everything is set, load first batch of posts
+        LoadEntries(postsUrl, pageState, OnPostsReceived);
+
+        //submit post section
+        var submitPostButton = document.getElementById("submitPostButton");
+        console.log("here I am " + submitPostButton.innerHTML);
+
+        if (submitPostButton) {
+            submitPostButton.addEventListener("click", function () {
+                console.log("sended");
+
+                let myform = document.getElementById("submitPostForm");
+                let fd = new FormData(myform);
+
+                jsonObject = {
+                    Content: fd.get("Content")
+                };
+
+                let errorOutput = document.getElementById("errorOutput");
+                PostAndValidateAndRedirect("/Post/Post", jsonObject, errorOutput);
+            });
+        } else console.log("Post a post btn not found");
     });
 </script>

@@ -1,4 +1,3 @@
-
 function PostAndValidateAndRedirect(url, data, errorOutput) {
     let jsonData = JSON.stringify(data);
 

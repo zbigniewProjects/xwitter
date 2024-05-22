@@ -16,7 +16,7 @@ namespace BlogProject.Infrastructure.Common
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("UserbaseConnection"));
+            optionsBuilder.UseNpgsql(_configuration.GetConnectionString("UserbaseConnection"));
         } 
 
         public DbSet<BlogUser>? BlogUsers { get; set; }

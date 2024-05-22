@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace BlogProject
 {
@@ -11,7 +12,7 @@ namespace BlogProject
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webbuilder => { 
+            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webbuilder => {
                 webbuilder.UseStartup<Startup>();
         });
     }

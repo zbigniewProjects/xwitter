@@ -6,7 +6,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BlogProject.styles.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/BlogProject.styles.css" asp-append-version="true" /> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
@@ -23,10 +23,10 @@
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a asp-controller="Home" class="nav-link text-light" id="postLink">Add a Post</a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Home" class="nav-link text-light" id="postLink">Add a Post</a>
+                            <a href="https://zbigniew.dev/contact" target="_blank" class="nav-link text-light" id="postLink">Contact</a>
                         </li>
                     </ul>
                     @await Html.PartialAsync("_LoginPartial")

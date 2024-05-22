@@ -1,7 +1,6 @@
 ﻿using BlogProject.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Xml;
 
 namespace BlogProject.Infrastructure.Common;
 

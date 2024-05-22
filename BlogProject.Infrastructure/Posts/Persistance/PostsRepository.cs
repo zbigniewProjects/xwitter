@@ -5,6 +5,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using BlogProject.Application.Models.Post;
+using BlogProject.Application.DTO;
+using BlogProject.Application.DTOs;
 
 namespace BlogProject.Infrastructure.Posts.Persistance
 {
@@ -27,25 +29,29 @@ namespace BlogProject.Infrastructure.Posts.Persistance
             return await _postsDbContext.Posts.FindAsync(id);
         }
 
-        public async Task<Post[]> GetPosts(int startID, int count)
+        public async Task<GetPostRangeMainFeedDTO> GetPostRangeMainFeed(int startID, int count)
         {
-           return await _postsDbContext.Posts.OrderByDescending(p => p.Id)!.Skip(startID).Take(count).ToArrayAsync();
+            Post[] posts = await _postsDbContext.Posts!.OrderByDescending(p => p.Id)!.Skip(startID).Take(count).ToArrayAsync();
+            int postsLeft = await _postsDbContext.Posts!.OrderByDescending(p => p.Id)!.Skip(startID + posts.Length).CountAsync();
+
+            return new GetPostRangeMainFeedDTO { Posts = posts, PostsLeft = postsLeft };
         }
 
-        public async Task<Comment[]> GetCommentsFromPost(uint postID, int startIndex, int count)
+        public async Task<GetCommentsFromPostDTO> GetCommentsFromPost(uint postID, int startIndex, int count)
         {
-            Post rawPost = await _postsDbContext.Posts.FindAsync(postID);
+            Post rawPost = await _postsDbContext.Posts!.FindAsync(postID);
 
-            int finalResultLength = Math.Clamp(rawPost.Comments.Count - startIndex, 0, count);
+            int finalResultLength = Math.Clamp(rawPost.Comments!.Count - startIndex, 0, count);
 
             if (finalResultLength == 0)
-                return null!;
+                return new GetCommentsFromPostDTO { CommentsLeft = 0};
 
             uint[] commentsIDs = new uint[finalResultLength];
             Array.Copy(rawPost.Comments.ToArray(), rawPost.Comments.Count-startIndex- finalResultLength, commentsIDs, 0, finalResultLength);
 
             Comment[] rawComments = await Task.FromResult(_postsDbContext.Comments.Where(p => commentsIDs.Contains(p.Id)).ToArray());
-            return rawComments;
+
+            return new GetCommentsFromPostDTO { Comments = rawComments, CommentsLeft = rawPost.Comments.Count - (startIndex + rawComments.Length)};
         }
 
         public async Task<Comment> GetCommentByID(uint commentID)
@@ -66,24 +72,12 @@ namespace BlogProject.Infrastructure.Posts.Persistance
             return await _postsDbContext.Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
-        public async Task<PostEntry[]> GetUserPosts(BlogUser user, int startIndex, int count)
+        public async Task<GetUsersPostDTO> GetUserPosts(uint userID, int startIndex, int count)
         {
-            Post[] posts = _postsDbContext.Posts!.OrderByDescending(x => x.Id).Where(x => x.AuthorID == user.Id).Skip(startIndex).Take(count).ToArray();
-            PostEntry[] entryPosts = new PostEntry[posts.Length];
+            Post[] posts = _postsDbContext.Posts!.OrderByDescending(x => x.Id).Where(x => x.AuthorID == userID).Skip(startIndex).Take(count).ToArray();
+            int remainingPostsCount = await _postsDbContext.Posts!.OrderByDescending(x => x.Id).Where(x => x.AuthorID == userID).Skip(startIndex+posts.Length).CountAsync();
 
-            for (int i = 0; i < entryPosts.Length; i++)
-            {
-                Post post = posts[i];
-                PostEntry postEntry = new PostEntry {
-                    Id = post.Id,
-                    AuthorName = user.UserName,
-                    Content = post.Content,
-                    Date = (DateTime)post.PostedAt!,
-                    NumberOfComments = post.Comments!.Count
-                };
-                entryPosts[i] = postEntry;
-            }
-            return entryPosts;
+            return new GetUsersPostDTO { Posts = posts, PostsLeft = remainingPostsCount };
         }
 
         public async Task<Post> GetPostByID(uint postID)

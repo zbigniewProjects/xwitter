@@ -10,6 +10,7 @@
 
 <head>
     <script src="~/js/postAndValidate.js"></script>
+    <script src="~/js/loadMoreEntries.js"></script>
     <script src="~/js/delete.js"></script>
     <link rel="stylesheet" href="~/css/post.css" asp-append-version="true" />
 </head>
@@ -49,48 +50,43 @@
         }
     </div>
     
-    <div id="comment-section" class="comment-section">
-        @await Html.PartialAsync("_CommentsPartial", Model.Comments)
+    <div id="comment-section" class="comment-section"></div>
+    <div style="clear:both">
+        <button id="fetchDataBtn">Load more comments</button>
     </div>
-    @if (Model.NumberOfComments > 0)
-    {
-        <div style="clear:both">
-            <button id="fetchDataBtn">Load more comments</button>
-        </div>
-    }
 </div>
 
 
 <script>
 
-    var loadedCycles = 1;
+    var commentsState = {
+        cycle: 0
+    };
     var loadMoreCommentsBtn = document.getElementById("fetchDataBtn");
-    if (loadMoreCommentsBtn != null)
-    loadMoreCommentsBtn.addEventListener("click", function () {
-        
-        //loadPartialView('/Post/getMoreComments/' + @Model.Id +":" + loadedCycles, document.getElementById("comment-section"));
-        fetch('/Post/getMoreComments/' + @Model.Id +":"+ loadedCycles)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.text(); // Assume response is HTML
-            })
-            .then(html => {
-                loadedCycles += 1;
-                // Create a temporary container element
-                const tempContainer = document.createElement('div');
-                tempContainer.innerHTML = html;
-
-                // Append the content of the temporary container to the end of the page
-                document.getElementById("comment-section").appendChild(tempContainer);
-            })
-            .catch(error => {
-                // Handle errors
-                console.error('There was a problem with the fetch operation:', error);
-            });
-    });
+    var commentsContainer = document.getElementById("comment-section");
+    var commentsUrl = '/Post/getMoreComments/'+@Model.Id+":";
     
+    //load first batch of posts
+    LoadEntries(commentsUrl, commentsState, OnCommentsLoaded)
+
+    //load more posts on end user input
+    document.getElementById("fetchDataBtn").addEventListener("click", function () {
+        LoadEntries(commentsUrl, commentsState, OnCommentsLoaded);
+    });
+
+    function OnCommentsLoaded(html, elementsCount, leftCount) {
+        commentsContainer.innerHTML += html;
+
+        if (leftCount > 0) {
+            loadMoreCommentsBtn.style.display = 'block';
+            loadMoreCommentsBtn.innerHTML = leftCount > 5 ?
+                `There are ${leftCount} comments left, click to load 5 more` :
+                `There are ${leftCount} comments left, click to load them`;
+        } else {
+            loadMoreCommentsBtn.style.display = 'none';
+        }
+    }
+   
     var deleteComUrl = '/Post/deletecom/@(Model.Id):';
     
     //comments deletion handler
@@ -120,7 +116,6 @@
         });
 
         function handleDeletedComment(divName) {
-
             var elementToRemove = document.getElementById(divName);
             console.log(`Deleting com for ${divName}`);
 

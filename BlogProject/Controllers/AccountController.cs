@@ -1,7 +1,4 @@
-﻿using BlogProject.Application.Authentication.Queries;
-using BlogProject.Application.Posts.Queries;
-using BlogProject.Application.Users.Queries;
-using BlogProject.Contracts.Authentication;
+﻿using BlogProject.Application.Users.Queries;
 using BlogProject.Domain;
 using BlogProject.MVC.Models;
 using BlogProject.MVC.ViewModels;
@@ -13,7 +10,6 @@ namespace BlogProject.Controllers
 {
     public class AccountController : Controller
     {
-
         private readonly SignInManager<BlogUser> _signInManager;
         private readonly UserManager<BlogUser> _userManager;
         private readonly IMediator _mediatR;
@@ -25,11 +21,11 @@ namespace BlogProject.Controllers
             _mediatR = mediatR;
         }
 
+        #region login section
         public IActionResult Login()
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> LoginAsync(LoginVM model)
         {
@@ -44,46 +40,36 @@ namespace BlogProject.Controllers
             }
             return View(model);
         }
+
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login", "Account");
+        }
+        #endregion
+        #region register section
         public IActionResult Register()
         {
             return View();
         }
 
-        [HttpGet("/{value}")]
-        public async Task<IActionResult> Account(string value) 
-        {
-            BlogUser user = await _mediatR.Send(new GetUserByTagQuery(value));
-            BlogUser authorizedUser = await _signInManager.UserManager.GetUserAsync(User);
-
-            if (user == null)
-                return View("AccountNotFound");
-
-            return View(new AccountPageVM { 
-                IsAuthenticated = authorizedUser != null && User.Identity!.IsAuthenticated && user.Id == authorizedUser.Id, 
-                ShortInfo = user.ShortInfo, 
-                Username = user.UserName,
-                UserId = user!.Id,
-                //TotalNumberOfPosts = 
-            });
-        }
-
         [HttpPost]
-        public async Task<IActionResult> RegisterAsync(RegisterVM model) 
+        public async Task<IActionResult> RegisterAsync(RegisterVM model)
         {
-            if(!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid) return View(model);
 
-            if (User.Identity!.IsAuthenticated) 
+            if (User.Identity!.IsAuthenticated)
             {
                 await _signInManager.SignOutAsync();
             }
 
             //check if user with desired username does exist already, if so return with proper feedback for client
             BlogUser userWithSameUsername = await _mediatR.Send(new GetUserByTagQuery(model.Username!));
-            if (userWithSameUsername != null) 
+            if (userWithSameUsername != null)
             {
                 ModelState.AddModelError("", $"Username {model.Username} is already taken.");
                 return View(model);
-            } 
+            }
 
             BlogUser user = new BlogUser
             {
@@ -106,11 +92,26 @@ namespace BlogProject.Controllers
 
             return View(model);
         }
+        #endregion
 
-        public async Task<IActionResult> Logout() 
+        /// <summary>
+        /// Draws and account page for user based on given url
+        /// </summary>
+        [HttpGet("/{value}")]
+        public async Task<IActionResult> Account(string value) 
         {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            BlogUser user = await _mediatR.Send(new GetUserByTagQuery(value));
+            BlogUser authorizedUser = await _signInManager.UserManager.GetUserAsync(User);
+
+            if (user == null)
+                return View("AccountNotFound");
+
+            return View(new AccountPageVM { 
+                IsAuthenticated = authorizedUser != null && User.Identity!.IsAuthenticated && user.Id == authorizedUser.Id, 
+                ShortInfo = user.ShortInfo, 
+                Username = user.UserName,
+                UserId = user!.Id,
+            });
         }
     }
 }

@@ -1,10 +1,5 @@
 ﻿using BlogProject.Application;
-using BlogProject.Domain;
 using BlogProject.Infrastructure;
-using BlogProject.Infrastructure.Common;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace BlogProject
 {

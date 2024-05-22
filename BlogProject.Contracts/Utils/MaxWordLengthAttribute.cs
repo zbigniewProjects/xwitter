@@ -2,15 +2,12 @@
 
 namespace BlogProject.Contracts.Utils
 {
-    public class MaxWordLengthAttribute : ValidationAttribute
+    /// <summary>
+    /// Just to prevent anyone from submitting any content that would contain single words that have absurd number of characters, that
+    /// would destroy website design if for example there was a post with a word: aaaaaaaaaaaaaaaaaaaaaaaaaa....
+    /// </summary>
+    public class MaxWordLengthAttribute(int _maxLength) : ValidationAttribute
     {
-        private readonly int _maxLength;
-
-        public MaxWordLengthAttribute(int maxLength)
-        {
-            _maxLength = maxLength;
-        }
-
         protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
         {
             if (value is string str)

@@ -1,4 +1,5 @@
-﻿using BlogProject.Application.Models.Post;
+﻿using BlogProject.Application.DTOs;
+using BlogProject.Application.Models.Post;
 using BlogProject.Application.Posts.Queries;
 using BlogProject.Domain;
 using MediatR;
@@ -10,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace BlogProject.Application.Posts.Handlers
 {
-    internal class GetUserPostsHandler(IPostsRepository _postsRepo, IUsersRepository _usersRepo) : IRequestHandler<GetUserPostsQuery, PostEntry[]>
+    internal class GetUserPostsHandler(IPostsRepository _postsRepo, IUsersRepository _usersRepo) :
+        IRequestHandler<GetUserPostsQuery, GetUsersPostDTO>
     {
-        public async Task<PostEntry[]> Handle(GetUserPostsQuery request, CancellationToken cancellationToken)
+        public async Task<GetUsersPostDTO> Handle(GetUserPostsQuery request, CancellationToken cancellationToken)
         {
-            BlogUser user = await _usersRepo.GetUserByID(request.userID);
-            PostEntry[] posts = await _postsRepo.GetUserPosts(user, request.startIndex, request.count);
+            GetUsersPostDTO posts = await _postsRepo.GetUserPosts(request.userID, request.startIndex, request.count);
             return posts;
         }
     }
