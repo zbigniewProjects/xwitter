@@ -1,6 +1,6 @@
 # Xwitter
 
-Xwitter is a simple X clone built using ASP.NET Core MVC. This project demonstrates the implementation of core social media functionalities such as posting messages and interacting with content.
+Xwitter is a simple X clone built using ASP.NET Core MVC. This project demonstrates the implementation of core x functionalities such as posting messages and interacting with content.
 
 ## Features
 - Login/Register functionality
